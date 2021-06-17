@@ -47,13 +47,20 @@ namespace EventStore.Client.Bugs {
 				userCredentials: userCredentials);
 
 			using (await _fixture.Client.SubscribeAsync(streamName, subscriptionName,
-				async (subscription, @event, arg3, arg4) => {
-					var result = Interlocked.Increment(ref hitCount);
+				async (subscription, @event, retryCount, arg4) => {
+					int result;
+					if (retryCount >= 1) {
+						result = hitCount;
+					} else {
+						result = Interlocked.Increment(ref hitCount);
+					}
+
 					await subscription.Ack(@event);
 
 					if (totalEvents == result) {
 						completed.TrySetResult(true);
 					}
+
 				}, (s, dr, e) => {
 					if (e != null)
 						completed.TrySetException(e);
