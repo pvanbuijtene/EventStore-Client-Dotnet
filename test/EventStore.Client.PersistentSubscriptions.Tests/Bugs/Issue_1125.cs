@@ -43,7 +43,9 @@ namespace EventStore.Client.Bugs {
 
 			await _fixture.Client.CreateAsync(streamName, subscriptionName,
 				new PersistentSubscriptionSettings(
-					resolveLinkTos: true, startFrom: StreamPosition.Start),
+					resolveLinkTos: true, startFrom: StreamPosition.Start,
+					readBatchSize: 10,
+					historyBufferSize: 20),
 				userCredentials: userCredentials);
 
 			using (await _fixture.Client.SubscribeAsync(streamName, subscriptionName,
